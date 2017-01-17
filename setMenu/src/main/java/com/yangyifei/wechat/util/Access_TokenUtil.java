@@ -15,13 +15,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yangyifei.wechat.Exception.MyException;
 
 public class Access_TokenUtil {
-	private static final String APPID="wxa2a5eb0e8694c896";
-	private static final String APP_SECRET="";
-	private static final String TOKEN_URL="https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+APPID+"&secret="+APP_SECRET;
+	private  static String TOKEN_URL="https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&";
 	private static final String LOCAL_TOKEN="token.txt";
-	private static int EXPIRES_IN=0;
-	public static String getToken() throws JsonProcessingException, UnsupportedOperationException, ClientProtocolException, IOException, MyException
+	private static int EXPIRES_IN=7200;
+	public static String getToken(String appId, String appSecret) throws JsonProcessingException, UnsupportedOperationException, ClientProtocolException, IOException, MyException
 	{
+		TOKEN_URL+="appid="+appId+"&secret="+appSecret;
 		if(!isTokenVailed())
 		{
 			 ObjectMapper objectMapper=new ObjectMapper();
@@ -31,10 +30,11 @@ public class Access_TokenUtil {
 				 throw new MyException(response.get("errmsg").asText());
 			 }
 			 String token = response.get("access_token").asText();
-			 EXPIRES_IN=response.get("expires_in").asInt();
 			 updateLocalToken(token);
+			 System.out.println("token 鏉ヨ嚜杩滅▼");
 			return token;
 		}
+		System.out.println("token 鏉ヨ嚜鏈湴");
 		return getTokenFormLocal() ;
 	}
 	
@@ -56,7 +56,7 @@ public class Access_TokenUtil {
 		else
 		{
 			scanner.close();
-			throw new MyException(LOCAL_TOKEN+"中没有token");
+			throw new MyException(LOCAL_TOKEN+"涓嶅瓨鍦╰oken");
 		}
 		scanner.close();
 		return token;
@@ -81,10 +81,30 @@ public class Access_TokenUtil {
 		else
 		{
 			scanner.close();
-			throw new MyException(LOCAL_TOKEN+"中没有timestamp");
+			throw new MyException(LOCAL_TOKEN+"涓嶅瓨鍦╰imestamp");
 		}
 		scanner.close();
 		Date now=new Date();
 		return ((now.getTime()-tiemstamp)/1000)<EXPIRES_IN;
 	}
+
+	public static int getEXPIRES_IN() {
+		return EXPIRES_IN;
+	}
+
+	public static void setEXPIRES_IN(int eXPIRES_IN) {
+		EXPIRES_IN = eXPIRES_IN;
+	}
+
+
+	public static String getTokenUrl() {
+		return TOKEN_URL;
+	}
+
+	public static String getLocalToken() {
+		return LOCAL_TOKEN;
+	}
+	
+	
+	
 }
